@@ -2,11 +2,12 @@ import mongoose from "mongoose";
 
 const connect = async() =>{
    try {
-    await mongoose.connect('mongodb://localhost:27017/blog-database')
+    await mongoose.connect(process.env.MONGO_URI)
  
     console.log('db connected')
    } catch (error) {
-    console.log(`Error: ${error.massage}`)
+     console.error("MongoDB connection failed:", error);
+    process.exit(1);
    }
 }
 

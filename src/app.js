@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-  origin: "https://blog-website-frontend-indol.vercel.app",
+  origin: process.env.CLIENT_URL,
 }));
 
 app.get('/blogs', async (req, res) => {
