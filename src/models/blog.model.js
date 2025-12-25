@@ -9,18 +9,20 @@ const blogSchema = mongoose.Schema({
         
     },
     date:{
-        type:String
+        type:Date,
+        default:Date.now
     },
     details:{
         type:String,
         required:true
     },
     imageUrl:{
-        type:String
-    },
-    author:{
         type:String,
         required:true
+    },
+    author:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"user"
     }
 })
 
