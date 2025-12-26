@@ -85,32 +85,33 @@ export const userLoginController = async (req, res) => {
 }
 
 export const getUserController = async (req, res) => {
-    try {
-        const token = req.cookies.token;
-
-        if (!token) {
-            return res.status(403).json({ message: 'user not logged in' });
+    
+   try {
+     const token = req.cookies?.token;
+ 
+     if(!token){
+         return res.status(401).json({message:"NO token provided!"});
+     }
+ 
+     const decoded = jwt.verify(token,process.env.SECRET_KEY);
+ 
+     res.status(200).json({
+         isAuthenticated:true,
+         user:{
+             username:decoded.username,
+             id:decoded.id
+         }
+     })
+   } catch (error) {
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ 
+                isAuthenticated: false,
+                message: "Token invalid or expired" 
+            });
         }
+     res.status(500).json({message:"Internal server Error!",error});
+   }
 
-        // const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        // console.log(decoded);
-
-        // res.status(200).json({
-        //     authenticated: true,
-        //     user: {
-        //         id: decoded.id,
-        //         email: decoded.email
-        //     }
-        // });
-
-        res.json(true);
-
-        console.log("chala")
-
-    } catch (error) {
-        res.status(401).json({ message: 'user not logged in' });
-        console.log("nhi chala");
-    }
 
 
 }
