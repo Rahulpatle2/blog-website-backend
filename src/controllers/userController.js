@@ -32,7 +32,7 @@ export const userRegisterController = async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "none",
         });
 
         res.status(201).json({ token, user: safeUser })
@@ -44,9 +44,9 @@ export const userRegisterController = async (req, res) => {
 
 export const userLoginController = async (req, res) => {
     try {
-        const { username, email, password } = req.body
+        const {  email, password } = req.body
 
-        if (!username || !email || !password) {
+        if ( !email || !password) {
             return res.status(400).json({ message: "All credentials required!" })
         }
         const user = await userModel.findOne({
@@ -68,12 +68,11 @@ export const userLoginController = async (req, res) => {
         const token = jwt.sign({
             id: user._id,
             email: user.email,
-            username: user.username
         }, process.env.SECRET_KEY, { expiresIn: "10m" });
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "none",
         });
 
         res.status(200).json({ message: "user logged in successfully", token });
@@ -87,31 +86,13 @@ export const userLoginController = async (req, res) => {
 export const getUserController = async (req, res) => {
     
    try {
-     const token = req.cookies?.token;
- 
-     if(!token){
-         return res.status(401).json({message:"NO token provided!"});
-     }
- 
-     const decoded = jwt.verify(token,process.env.SECRET_KEY);
- 
-     res.status(200).json({
-         isAuthenticated:true,
-         user:{
-             username:decoded.username,
-             id:decoded.id
-         }
-     })
-   } catch (error) {
-    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-            return res.status(401).json({ 
-                isAuthenticated: false,
-                message: "Token invalid or expired" 
-            });
-        }
-     res.status(500).json({message:"Internal server Error!",error});
-   }
-
+        res.status(200).json({
+            isAuthenticated: true,
+            user: req.user 
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Server Error" });
+    }
 
 
 }

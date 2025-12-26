@@ -14,7 +14,9 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: process.env.CLIENT_URL,
-  credentials:true
+  credentials:true,
+  methods: ["GET", "POST", "PUT", "DELETE"], 
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use('/users',userRoutes);
