@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import blogModel from '../models/blog.model';
+import blogModel from '../models/blog.model.js';
 
 export const VerifiedUser = async(req,res,next) =>{
     try {
