@@ -23,29 +23,41 @@ export const VerifiedUser = async(req,res,next) =>{
 
 export const isOwner = async (req, res, next) => {
     try {
-        const userId = req.user.id;
-        const blogId = req.params.id;
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized: User info missing" });
+        }
         
-        const blog = await blogModel.findById(blogId);
+        const blog = await blogModel.findById(req.params.id);
 
-        // 1. FIX: Handle case where blog doesn't exist
         if (!blog) {
             return res.status(404).json({ message: "Blog post not found" });
         }
 
-        // 2. FIX: specific comparison logic
-        // We use .toString() to ensure we compare String vs String. 
-        // Note: Check if your schema stores the user as 'blog.user' or 'blog.user._id'
-        const ownerId = blog.user.id.toString(); 
+        
+        console.log("Fetched Blog:", blog); 
+
+       
+        if (!blog.author) {
+            return res.status(500).json({ 
+                message: "Server Error: This blog post has no author/user field." 
+            });
+        }
+
+        console.log(blog.author)
+
+        
+        const ownerId = blog.author.toString(); 
+        const userId = req.user.id;
 
         if (ownerId !== userId) {
-            // 3. FIX: Use 403 (Forbidden) instead of 402
-            return res.status(403).json({ message: "You are not authorized to modify this content" });
+            return res.status(403).json({ message: "You can't change other people's blogs" });
         }
 
         next();
+
     } catch (error) {
-        console.error(error); // Good to log the actual error for debugging
+        
         res.status(500).json({ message: "Internal server error" });
+        console.log(error);
     }
 }

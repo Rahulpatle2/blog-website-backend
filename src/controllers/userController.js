@@ -31,7 +31,7 @@ export const userRegisterController = async (req, res) => {
         }, process.env.SECRET_KEY);
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            // secure: process.env.NODE_ENV === "production",
             sameSite: "none",
         });
 
@@ -68,17 +68,25 @@ export const userLoginController = async (req, res) => {
         const token = jwt.sign({
             id: user._id,
             email: user.email,
-        }, process.env.SECRET_KEY, { expiresIn: "10m" });
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "none",
-        });
+        }, process.env.SECRET_KEY, { expiresIn: "1d" });
+        // ✅ This tells the browser: "Save this token in the cookie jar!"
+res.cookie('token', token, {
+    httpOnly: true,  // Frontend JavaScript cannot read this (Security)
+    secure: false,   // Set to TRUE if using HTTPS (Production), FALSE for localhost
+    sameSite: 'lax', // Needed for localhost to keep the cookie
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days (in milliseconds)
+});
+res.status(200).json({ 
+    message: "user logged in successfully",
+    user: user // Optional: send user data so frontend can update state immediately
+});
 
         res.status(200).json({ message: "user logged in successfully", token });
+        console.log("chala");
 
     } catch (error) {
         res.status(500).json({ message: error.message });
+        console.log("nhi chala")
     }
 
 }
